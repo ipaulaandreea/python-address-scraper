@@ -1,6 +1,8 @@
 from requests.exceptions import ProxyError, ConnectTimeout
 from get_country import my_object
 import requests
+from extract_db import df
+
 patterns = [
     '/contact',
     '/contact-us',
@@ -10,7 +12,7 @@ patterns = [
     '/about',
     '/about-us'
 ]
-
+print(df)
 dummy_pages = []
 
 proxies = {
