@@ -2,7 +2,7 @@ from requests.exceptions import ProxyError, ConnectTimeout
 from get_country import my_object
 import requests
 from extract_db import df
-
+from turn_db_entries_into_list import domain_list;
 patterns = [
     '/contact',
     '/contact-us',
@@ -12,8 +12,6 @@ patterns = [
     '/about',
     '/about-us'
 ]
-print(df)
-dummy_pages = []
 
 proxies = {
     'http': 'http://user:password@10.10.1.10:3128',
@@ -34,25 +32,24 @@ def lookup(url):
     return None
 
 def check_contact_page(websites, patterns):
-    results = {}
+    results = []
     for website in websites:
-        results[website] = False 
+        found_contact_page = False 
         for pattern in patterns:
             contact_url = f"http://{website}{pattern}"
-            response = lookup(contact_url) 
+            response = lookup(contact_url)
             
-            if not response:
-                continue 
-                
-            if response.status_code == 200:
-                results[website] = contact_url
+            if response and response.status_code == 200:
+                results.append((website, contact_url)) 
+                found_contact_page = True
                 break
+
+        if not found_contact_page:
+            continue 
+
     return results
 
+websites_with_contact_pages = check_contact_page(domain_list, patterns)
 
-contact_page_exists = check_contact_page(my_object[11:30], patterns)
-websites_with_contact_pages=[]
-for website, contact_url in contact_page_exists.items():
-    websites_with_contact_pages.append({website, contact_url})
 print(websites_with_contact_pages)
 
