@@ -1,6 +1,6 @@
 from urllib.parse import urlparse
 import tldextract
-from challenge1 import df
+from extract_db import df
 my_object = df['domain'].tolist()
 
 
