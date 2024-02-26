@@ -1,0 +1,7 @@
+# Environment variables
+.env
+
+# Database files
+domains.snappy.parquet
+
+# TODO: LA PAGINILE CARE NU AU CONTACT PAGE INCEARCA SA CAUTI ADRESA PE PAGINA PRINCIPALA
