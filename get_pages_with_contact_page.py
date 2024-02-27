@@ -1,3 +1,4 @@
+import time
 from requests.exceptions import ProxyError, ConnectTimeout
 from get_country import my_object
 import requests
@@ -19,6 +20,7 @@ proxies = {
 }
 
 def lookup(url):
+    
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
@@ -32,6 +34,7 @@ def lookup(url):
     return None
 
 def check_contact_page(websites, patterns):
+    start = time.time()
     results = []
     for website in websites:
         found_contact_page = False 
@@ -46,7 +49,9 @@ def check_contact_page(websites, patterns):
 
         if not found_contact_page:
             continue 
-
+    end = time.time()
+    print("The time of execution of above program is :",
+      (end-start) * 10**3, "ms")
     return results
 
 websites_with_contact_pages = check_contact_page(domain_list, patterns)
