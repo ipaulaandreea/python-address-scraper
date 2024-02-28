@@ -1,18 +1,8 @@
-import time
-from requests.exceptions import ProxyError, ConnectTimeout
-from get_country import my_object
-import requests
-from extract_db import df
 from turn_db_entries_into_list import domain_list;
-patterns = [
-    '/contact',
-    '/contact-us',
-    '/support',
-    '/help',
-    '/about/contact',
-    '/about',
-    '/about-us'
-]
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
+from requests.exceptions import ProxyError, ConnectTimeout, HTTPError, RequestException
+import requests
 
 proxies = {
     'http': 'http://user:password@10.10.1.10:3128',
@@ -20,41 +10,50 @@ proxies = {
 }
 
 def lookup(url):
-    
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
     try:
         response = requests.get(url, headers=headers, timeout=5, verify=False)
+        response.raise_for_status()
         return response
-    except (ProxyError, ConnectTimeout) as e:
-        print(f"Request failed for {url}: {e}")
-    except requests.RequestException as e:
+    except (ProxyError, ConnectTimeout, HTTPError, RequestException) as e:
         print(f"Request failed for {url}: {e}")
     return None
 
-def check_contact_page(websites, patterns):
+def check_single_website(website):
+    patterns = [
+    '/contact',
+    '/contact-us',
+    '/about',
+    '/about-us',
+    '/about/contact',
+    '/support',
+    '/help',
+]
+    for pattern in patterns: 
+        contact_url = f"http://{website}{pattern}"
+        response = lookup(contact_url)
+        if response and response.status_code == 200: 
+            return (website, contact_url)
+        else:
+            continue
+    return (website, None)
+
+def check_contact_page(websites):
     start = time.time()
     results = []
-    for website in websites:
-        found_contact_page = False 
-        for pattern in patterns:
-            contact_url = f"http://{website}{pattern}"
-            response = lookup(contact_url)
-            
-            if response and response.status_code == 200:
-                results.append((website, contact_url)) 
-                found_contact_page = True
-                break
-
-        if not found_contact_page:
-            continue 
+    with ThreadPoolExecutor(max_workers=12) as executor:  
+        future_to_website = {executor.submit(check_single_website, website): website for website in websites}
+        for future in as_completed(future_to_website): 
+            website, contact_url = future.result()
+            if contact_url:
+                results.append((website, contact_url))    
     end = time.time()
-    print("The time of execution of above program is :",
-      (end-start) * 10**3, "ms")
+    print("Execution time:", (end-start) * 1000, "ms")
     return results
 
-websites_with_contact_pages = check_contact_page(domain_list, patterns)
+
+websites_with_contact_pages = check_contact_page(domain_list)
 
 print(websites_with_contact_pages)
-

@@ -22,6 +22,8 @@ conn = mysql.connector.connect(
 
 cursor = conn.cursor()
 
+
+
 insert_stmt = "INSERT INTO domains_with_address (domain, contact_page) VALUES (%s, %s)"
 
 for website, contact_url in websites_with_contact_pages:

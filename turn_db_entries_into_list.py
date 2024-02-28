@@ -22,7 +22,7 @@ conn = mysql.connector.connect(
 
 cur = conn.cursor()
 
-query = 'SELECT domain FROM domains ORDER BY id LIMIT 10;'
+query = 'SELECT domain FROM domains ORDER BY id;'
 
 
 cur.execute(query)
