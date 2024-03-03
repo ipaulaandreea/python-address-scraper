@@ -4,3 +4,5 @@
 # Database files
 domains.snappy.parquet
 
+venv
+__pycache__

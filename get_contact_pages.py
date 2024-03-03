@@ -1,4 +1,3 @@
-from turn_db_entries_into_list import domain_list;
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from requests.exceptions import ProxyError, ConnectTimeout, HTTPError, RequestException
@@ -48,12 +47,10 @@ def check_contact_page(websites):
         for future in as_completed(future_to_website): 
             website, contact_url = future.result()
             if contact_url:
-                results.append((website, contact_url))    
+                results.append((website, contact_url))
+            else: results.append((website, 'NULL')) 
     end = time.time()
     print("Execution time:", (end-start) * 1000, "ms")
     return results
 
 
-websites_with_contact_pages = check_contact_page(domain_list)
-
-print(websites_with_contact_pages)
