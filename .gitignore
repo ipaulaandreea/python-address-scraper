@@ -5,4 +5,4 @@
 domains.snappy.parquet
 
 venv
-__pycache__
+__pycache__/
