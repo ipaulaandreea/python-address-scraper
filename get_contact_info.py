@@ -49,6 +49,3 @@ def process_urls(urls):
             link, address = future.result()
             all_addresses.append((link, address))
     return all_addresses
-
-
-           # Assume address_str_results is a list of (url, address_string)

@@ -1,38 +1,36 @@
 from get_contact_info import process_urls
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import pyap
-
-
-def parse_address(address_string):
-    address_parser = pyap.parse(address_string, country='US')
-    if address_parser:
-        parsed_address = address_parser[0]
-        return {
-            'country': "US",
-            'city': parsed_address.city if parsed_address.city else "N/A",
-            'region': parsed_address.region if parsed_address.region else "N/A",
-            'postcode': parsed_address.postal_code if parsed_address.postal_code else "N/A",
-            'road': parsed_address.street_name if parsed_address.street_name else "N/A",
-            'road_number': parsed_address.street_number if parsed_address.street_number else "N/A"
-        }
-    else:
-        print("No address found in:", address_string)
-        return {
-            'country': "N/A",
-            'city': "N/A",
-            'region': "N/A",
-            'postcode': "N/A",
-            'road': "N/A",
-            'road_number': "N/A"
-        }
+import pypostalwin
 
 def organize_contact_info(urls):
     address_strings = process_urls(urls)
     organized_addresses = []
-    
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        future_to_address = {executor.submit(parse_address, address): address for address in address_strings}
-        for future in as_completed(future_to_address):
-            organized_addresses.append(future.result())
+    for address_string in address_strings:
+        parser = pypostalwin.AddressParser()
+        parsed_address = parser.runParser(address_string)
+        consolidated_address = {}
+        for component_dict in parsed_address:
+            for key, value in component_dict.items():
+                consolidated_address[key] = value
 
-    return organized_addresses
+    final_address = {
+        'country': consolidated_address.get('country', 'N/A'),
+        'city': consolidated_address.get('city', 'N/A'),
+        'region': consolidated_address.get('state', 'N/A'),  
+        'postcode': consolidated_address.get('postcode', 'N/A'),
+        'road': consolidated_address.get('road', 'N/A'),
+        'road_number': consolidated_address.get('house_number', 'N/A'), 
+    }
+    organized_addresses.append(final_address)
+
+    return final_address
+
+
+parsed_address = [
+    {'house': 'the white house'},
+    {'house_number': '1600'},
+    {'road': 'pennsylvania avenue nw'},
+    {'city': 'washington'},
+    {'state': 'dc'},
+    {'postcode': '20500'},
+    {'country': 'usa'}
+]
