@@ -14,7 +14,9 @@ address_regexes = [
     r'[A-Z]{1,2}\d{1,2}\s?\d[A-Z]{2}',
     r'\b(?:P\.?O\.?\s?BOX)\s+\d+\s+([A-Za-z\s]+),\s*([A-Z]{2})\s*(\d{5}(-\d{4})?)\b',
     r'/^ *((#\d+)|((box|bin)[-. \/\\]?\d+)|(.*p[ \.]? ?(o|0)[-. \/\\]? *-?((box|bin)|b|(#|n|num|number)?\d+))|(p(ost|ostal)? *(o(ff(ice)?)?)? *((box|bin)|b)? *(#|n|num|number)*\d+)|(p *-?\/?(o)? *-?box)|post office box|((box|bin)|b) *(#|n|num|number)? *\d+|(#|n|num|number) *\d+)/i',
-    r'\b\d+\s[\w\s-]+,\s(?:Unit\s\w+-\d+,)?\s[\w\s-]+,\s[A-Z]{2}\s\d{5}\b'
+    r'\b\d+\s[\w\s-]+,\s(?:Unit\s\w+-\d+,)?\s[\w\s-]+,\s[A-Z]{2}\s\d{5}\b',
+    r'(\d+\s[A-Za-z\s]+(?:Street|St|Ave|Avenue|Road|Rd|Boulevard|Blvd|Lane|Ln|Circle|Cir|Drive|Dr|Court|Ct|Parkway|Pkwy|Square|Sq|Trail|Trl|Way)\.?\s?(?:S\.?|N\.?|E\.?|W\.?)?)(?:\s-\sPO\sBox\s\d+)?,\s([A-Za-z\s]+),\s([A-Z]{2})\s(\d{5})',
+    r'(\d+\s[A-Za-z\s]+(?:Avenue|Ave|Street|St|Road|Rd|Boulevard|Blvd|Lane|Ln|Circle|Cir|Drive|Dr|Court|Ct|Parkway|Pkwy|Square|Sq|Trail|Trl|Way)),\s*(?:Suite|Ste|Unit|Apt|#)?\s*([\d\-]+)?\s*([A-Za-z\s]+),\s*([A-Z]{2})\s*(\d{5})'
 ]
 
 address_patterns = [re.compile(pattern, re.IGNORECASE) for pattern in address_regexes]
@@ -44,11 +46,9 @@ def process_urls(urls):
     with ThreadPoolExecutor(max_workers=12) as executor:
         future_to_addresses = [executor.submit(get_contact_info, url) for url in urls]
         for future in concurrent.futures.as_completed(future_to_addresses):
-            addresses = future.result()
-            all_addresses.extend(addresses) 
+            link, address = future.result()
+            all_addresses.append((link, address))
     return all_addresses
 
-urls = [
-]
-    
-print(process_urls(urls))
+
+           # Assume address_str_results is a list of (url, address_string)
