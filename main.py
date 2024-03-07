@@ -1,10 +1,8 @@
-from get_contact_info import process_urls
-from generate_sitemap import find_sitemap_and_extract_urls_for_domain
+from generate_sitemap import process_domains_in_parallel
+from preprocessing_data import preprocess_data
 
 def main():
-    domains = []
-    urls = find_sitemap_and_extract_urls_for_domain(domains)
-    process_urls(urls)
+    domains = preprocess_data()
+    process_domains_in_parallel(domains[25:35])
     
-
 main()

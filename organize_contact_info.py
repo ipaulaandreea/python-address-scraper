@@ -32,7 +32,6 @@ def organize_contact_info(address_string):
             'road_number': 'N/A',
             'original_address': address_string
         }
-    # organized_addresses.append(final_address)
 
     return final_address
 

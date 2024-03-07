@@ -25,15 +25,13 @@ address_regexes = [
     r'\d+\s+[A-Z0-9][a-z0-9\s]*\b(?:Street|St|Rd|Road|Ave|Avenue|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct|Parkway|Pkwy|Circle|Cir|Square|Sq|Trail|Trl|Way|Terrace|Terr|Place|Pl)(?:,?\s+Suite\s+[A-Z0-9]+)?,?\s+[A-Za-z\s]+,\s+[A-Z]{2}\s+\d{5}(-\d{4})?',
     r'\b\d+\s+[A-Za-z0-9\s]*\b(?:St|Street|Rd|Road|Ave|Avenue|Blvd|Boulevard|Ln|Lane|Dr|Drive|Ct|Court|Pkwy|Parkway|Cir|Circle|Sq|Square|Trl|Trail|Way|Terr|Terrace|Pl|Place)\b(?:\s+(?:Suite|Ste|Unit|Apt|#)\s*\w+)?,?\s+[A-Za-z\s]+,\s+[A-Z]{2}\s+\d{5}(-\d{4})?'
 
-
 ]
-
 
 address_patterns = [re.compile(pattern, re.IGNORECASE)
                     for pattern in address_regexes]
 
 
-def get_contact_info(link):
+def get_contact_info(link, base_url):
     found_addresses = []
     organized_addresses = []
     keywords = ['contact', 'address', 'location', 'office',
@@ -49,7 +47,6 @@ def get_contact_info(link):
         try:
             soup = BeautifulSoup(response.text, 'html.parser')
             text_content = ' '.join(soup.stripped_strings).lower()
-            # text_content = ' '.join(soup.get_text(" ", strip=True).lower().split())
             if any(keyword in text_content for keyword in keywords):
 
                 for address_pattern in address_patterns:
@@ -69,7 +66,7 @@ def get_contact_info(link):
                             organized_addresses.append(organized_address)
                         serialized_data = json.dumps(organized_addresses)
                         insert_page_content_to_db(
-                            link, response.text, found_addresses, serialized_data)
+                            link, base_url, response.text, found_addresses, serialized_data)
                         print(f"Saved content for {link}")
                     except Exception as process_error:
                         print(
@@ -80,6 +77,7 @@ def get_contact_info(link):
             print(f"Error parsing content from {link}: {parse_error}")
 
 
-def process_urls(urls):
+def process_urls(urls, base_url):
     with ThreadPoolExecutor(max_workers=12) as executor:
-        executor.map(get_contact_info, urls)
+        func = lambda url: get_contact_info(url, base_url)
+        executor.map(func, urls)
