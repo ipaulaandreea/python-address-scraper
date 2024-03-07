@@ -31,7 +31,7 @@ address_patterns = [re.compile(pattern, re.IGNORECASE)
                     for pattern in address_regexes]
 
 
-def get_contact_info(link, base_url):
+def get_contact_info(link):
     found_addresses = []
     organized_addresses = []
     keywords = ['contact', 'address', 'location', 'office',
@@ -66,7 +66,7 @@ def get_contact_info(link, base_url):
                             organized_addresses.append(organized_address)
                         serialized_data = json.dumps(organized_addresses)
                         insert_page_content_to_db(
-                            link, base_url, response.text, found_addresses, serialized_data)
+                            link, response.text, found_addresses, serialized_data)
                         print(f"Saved content for {link}")
                     except Exception as process_error:
                         print(
@@ -77,7 +77,6 @@ def get_contact_info(link, base_url):
             print(f"Error parsing content from {link}: {parse_error}")
 
 
-def process_urls(urls, base_url):
-    with ThreadPoolExecutor(max_workers=12) as executor:
-        func = lambda url: get_contact_info(url, base_url)
-        executor.map(func, urls)
+def process_urls(urls):
+    for url in urls:
+        get_contact_info(url)

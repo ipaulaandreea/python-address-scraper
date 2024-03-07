@@ -13,14 +13,14 @@ def get_db_connection():
     return pymysql.connect(host=host_name, user=user_name, password=user_password, database=db_name, cursorclass=pymysql.cursors.DictCursor)
 
 
-def insert_page_content_to_db(link, base_url, html_content, found_addresses, serialized_data):
+def insert_page_content_to_db(link, html_content, found_addresses, serialized_data):
     connection = get_db_connection()
     delimited_addresses = '; '.join(found_addresses) if found_addresses else ''
     try:
         with connection.cursor() as cursor:
             sql = """
-             INSERT INTO pages_and_addresses (page, domain_name, html_str, address_str, organized_address)
-            VALUES (%s, %s, %s, %s, %s)
+             INSERT INTO pages_and_addresses (page, html_str, address_str, organized_address)
+            VALUES (%s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
                 html_str = VALUES(html_str),
                 address_str = VALUES(address_str),
@@ -28,7 +28,7 @@ def insert_page_content_to_db(link, base_url, html_content, found_addresses, ser
             """
             serialized_data = serialized_data if serialized_data is not None else json.dumps([
             ])
-            cursor.execute(sql, (link, base_url, html_content,
+            cursor.execute(sql, (link, html_content,
                            delimited_addresses, serialized_data))
             connection.commit()
     finally:

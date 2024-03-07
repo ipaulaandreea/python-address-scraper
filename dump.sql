@@ -9,8 +9,7 @@ CREATE TABLE IF NOT EXISTS `pages_and_addresses` (
   `page` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `address_str` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
   `html_str` longtext,
-  `domain_name` varchar(1000) DEFAULT NULL,
   `organized_address` json DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `page` (`page`)
-) ENGINE=InnoDB AUTO_INCREMENT=1518 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2140 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
